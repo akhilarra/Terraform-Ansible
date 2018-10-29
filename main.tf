@@ -367,7 +367,7 @@ resource "aws_s3_bucket" "code" {
 resource "aws_db_instance" "wp_db" {
   allocated_storage      = 10
   engine                 = "mysql"
-  engine_version         = "5.6.27"
+  
   instance_class         = "${var.db_instance_class}"
   name                   = "${var.dbuser}"
   username               = "${var.dbuser}"
@@ -415,11 +415,6 @@ resource "aws_elb" "wp_elb" {
 }
 
 # key pair
-resource "aws_key_pair" "wp_auth" {
-  key_name   = "${var.key_name}"
-  public_key = "${file(var.public_key_path)}"
-}
-
 #-----EC2-----
 resource "aws_instance" "wp_dev" {
   instance_type = "${var.dev_instance_type}"
@@ -430,7 +425,7 @@ resource "aws_instance" "wp_dev" {
     Owner = "Akhil"
   }
 
-  key_name               = "${aws_key_pair.wp_auth.id}"
+  key_name               = "demo"
   vpc_security_group_ids = ["${aws_security_group.wp_dev_sg.id}"]
   iam_instance_profile   = "${aws_iam_instance_profile.s3_access_profile.id}"
   subnet_id              = "${aws_subnet.wp_public1_subnet.id}"
@@ -482,7 +477,7 @@ resource "aws_launch_configuration" "wp_lc" {
   instance_type        = "${var.lc_instance_type}"
   security_groups      = ["${aws_security_group.wp_private_sg.id}"]
   iam_instance_profile = "${aws_iam_instance_profile.s3_access_profile.id}"
-  key_name             = "${aws_key_pair.wp_auth.id}"
+  key_name             = "demo"
   user_data            = "${file("userdata.sh")}"
 
   lifecycle {
